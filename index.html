@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dery's Villa VR - Exterior</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loader">
+        <div class="loading-logo">🌴</div>
+        <div class="loading-title">Tropical Luxury Villa</div>
+        <div class="loading-subtitle">Virtual Reality Experience</div>
+        <div class="loading-bar-container"><div class="loading-bar"></div></div>
+        <div class="loading-hint">Use WASD to move · Mouse to look around</div>
+    </div>
+
+    <div class="room-label">🌴 Villa Exterior</div>
+    <div class="hud">WASD to move · Mouse to look · Use side buttons to navigate</div>
+    <div class="crosshair"></div>
+
+    <div class="nav-panel">
+        <a class="nav-btn" href="living-room.html"><span class="icon">🚪</span> Enter Villa</a>
+    </div>
+
+    <a-scene renderer="antialias: true" fog="type: linear; color: #87CEEB; far: 80; near: 40">
+        <a-assets timeout="10000">
+            <img id="grass" src="assets/textures/grass.jpg">
+            <img id="wall" src="assets/textures/wall.jpg">
+            <img id="roof" src="assets/textures/roof.jpg">
+            <img id="stone-path" src="assets/textures/stone-path.jpg">
+            <img id="wood-deck" src="assets/textures/wood-deck.jpg">
+            <img id="door" src="assets/textures/door.jpg">
+            <img id="sky" src="assets/textures/sky.jpg">
+            <a-asset-item id="car-model" src="assets/models/car.glb"></a-asset-item>
+            <a-asset-item id="car2-model" src="assets/models/car2.glb"></a-asset-item>
+            <a-asset-item id="palm-model" src="assets/models/palm-tree.glb"></a-asset-item>
+            <a-asset-item id="fountain-model" src="assets/models/fountain.glb"></a-asset-item>
+        </a-assets>
+
+        <!-- Sky (texture) -->
+        <a-sky src="#sky"></a-sky>
+
+        <!-- Lighting -->
+        <a-light type="ambient" color="#FFF5E1" intensity="0.5"></a-light>
+        <a-light type="directional" color="#FFD700" intensity="0.8" position="10 15 -5"></a-light>
+        <a-light type="hemisphere" color="#87CEEB" groundColor="#3a7d44" intensity="0.3"></a-light>
+
+        <!-- Camera -->
+        <a-entity id="rig" position="0 1.6 16">
+            <a-camera wasd-controls="acceleration: 20" look-controls></a-camera>
+        </a-entity>
+
+        <!-- ===== GROUND ===== -->
+        <a-plane src="#grass" rotation="-90 0 0" width="60" height="60" repeat="12 12" position="0 0 0"></a-plane>
+        <a-plane src="#stone-path" rotation="-90 0 0" width="5" height="18" repeat="2 8" position="0 0.01 8"></a-plane>
+
+        <!-- ===== VILLA STRUCTURE ===== -->
+        <!-- Front wall with door gap -->
+        <a-box src="#wall" width="6.5" height="4.5" depth="0.3" position="-4.75 2.25 0" repeat="2 2"></a-box>
+        <a-box src="#wall" width="6.5" height="4.5" depth="0.3" position="4.75 2.25 0" repeat="2 2"></a-box>
+        <a-box src="#wall" width="3" height="1.5" depth="0.3" position="0 3.75 0" repeat="1 1"></a-box>
+        <!-- Back wall -->
+        <a-box src="#wall" width="16" height="4.5" depth="0.3" position="0 2.25 -14" repeat="4 2"></a-box>
+        <!-- Side walls -->
+        <a-box src="#wall" width="0.3" height="4.5" depth="14" position="-8 2.25 -7" repeat="1 2"></a-box>
+        <a-box src="#wall" width="0.3" height="4.5" depth="14" position="8 2.25 -7" repeat="1 2"></a-box>
+
+        <!-- Second floor walls -->
+        <a-box src="#wall" width="16" height="2.5" depth="0.25" position="0 5.75 0" repeat="4 1"></a-box>
+        <a-box src="#wall" width="16" height="2.5" depth="0.25" position="0 5.75 -14" repeat="4 1"></a-box>
+        <a-box src="#wall" width="0.25" height="2.5" depth="14" position="-8 5.75 -7" repeat="1 1"></a-box>
+        <a-box src="#wall" width="0.25" height="2.5" depth="14" position="8 5.75 -7" repeat="1 1"></a-box>
+
+        <!-- Floor divider & roof -->
+        <a-box color="#F5F0E8" width="16.3" height="0.2" depth="14.3" position="0 4.5 -7"></a-box>
+        <a-box src="#roof" width="17" height="0.25" depth="15" position="0 7.1 -7" repeat="4 3"></a-box>
+        <a-box src="#roof" width="17.5" height="0.15" depth="1" position="0 7.05 0.5" repeat="4 1"></a-box>
+        <a-box src="#roof" width="17.5" height="0.15" depth="1" position="0 7.05 -14.5" repeat="4 1"></a-box>
+
+        <!-- ===== FRONT DOOR ===== -->
+        <a-box color="#3d1c00" width="2.6" height="3.4" depth="0.35" position="0 1.7 0.05"></a-box>
+        <a-box id="front-door" src="#door" width="2.2" height="3" depth="0.15" position="0 1.5 0.15">
+            <a-sphere color="#DAA520" radius="0.07" position="-0.6 0 0.1"></a-sphere>
+            <a-sphere color="#DAA520" radius="0.07" position="0.6 0 0.1"></a-sphere>
+            <a-ring color="#DAA520" radius-inner="0.06" radius-outer="0.09" position="0 0.5 0.1"></a-ring>
+        </a-box>
+        <a-text value="Click to Enter" color="#FFD700" align="center" width="5" position="0 3.6 0.3"
+                animation="property: material.opacity; from: 0.4; to: 1; dur: 1200; loop: true; dir: alternate"></a-text>
+        <a-light type="spot" color="#FFE4B5" intensity="0.8" distance="6" angle="40" position="0 3.8 0.8" target="#front-door"></a-light>
+
+        <!-- ===== WINDOWS - First Floor ===== -->
+        <a-box color="#5C3317" width="2.2" height="1.7" depth="0.08" position="-4.5 2.5 0.16"></a-box>
+        <a-box color="#87CEEB" width="2" height="1.5" depth="0.06" position="-4.5 2.5 0.2" opacity="0.5"></a-box>
+        <a-box color="#5C3317" width="0.06" height="1.5" depth="0.08" position="-4.5 2.5 0.22"></a-box>
+        <a-box color="#5C3317" width="2" height="0.06" depth="0.08" position="-4.5 2.5 0.22"></a-box>
+        <a-box color="#5C3317" width="2.2" height="1.7" depth="0.08" position="4.5 2.5 0.16"></a-box>
+        <a-box color="#87CEEB" width="2" height="1.5" depth="0.06" position="4.5 2.5 0.2" opacity="0.5"></a-box>
+        <a-box color="#5C3317" width="0.06" height="1.5" depth="0.08" position="4.5 2.5 0.22"></a-box>
+        <a-box color="#5C3317" width="2" height="0.06" depth="0.08" position="4.5 2.5 0.22"></a-box>
+
+        <!-- Second Floor Windows -->
+        <a-box color="#5C3317" width="1.8" height="1.3" depth="0.08" position="-4.5 5.8 0.14"></a-box>
+        <a-box color="#87CEEB" width="1.6" height="1.1" depth="0.06" position="-4.5 5.8 0.18" opacity="0.5"></a-box>
+        <a-box color="#5C3317" width="1.8" height="1.3" depth="0.08" position="0 5.8 0.14"></a-box>
+        <a-box color="#87CEEB" width="1.6" height="1.1" depth="0.06" position="0 5.8 0.18" opacity="0.5"></a-box>
+        <a-box color="#5C3317" width="1.8" height="1.3" depth="0.08" position="4.5 5.8 0.14"></a-box>
+        <a-box color="#87CEEB" width="1.6" height="1.1" depth="0.06" position="4.5 5.8 0.18" opacity="0.5"></a-box>
+
+        <!-- ===== FRONT PORCH ===== -->
+        <a-box src="#wood-deck" width="12" height="0.15" depth="4" position="0 0.08 2.5" repeat="5 2"></a-box>
+        <a-box src="#stone-path" width="4" height="0.1" depth="0.6" position="0 0.03 4.5" repeat="2 1"></a-box>
+        <a-cylinder color="#F5F5DC" radius="0.18" height="4.2" position="-5.5 2.1 2.5"></a-cylinder>
+        <a-cylinder color="#F5F5DC" radius="0.18" height="4.2" position="5.5 2.1 2.5"></a-cylinder>
+        <a-cylinder color="#F5F5DC" radius="0.18" height="4.2" position="-2 2.1 2.5"></a-cylinder>
+        <a-cylinder color="#F5F5DC" radius="0.18" height="4.2" position="2 2.1 2.5"></a-cylinder>
+        <a-box src="#roof" width="12.5" height="0.2" depth="4.5" position="0 4.2 2.5" repeat="3 1"></a-box>
+
+        <!-- Hanging porch plants -->
+        <a-entity position="-4 3.5 2.5">
+            <a-cylinder color="#8B4513" radius="0.1" height="0.2"></a-cylinder>
+            <a-sphere color="#228B22" radius="0.2" position="0 -0.15 0"></a-sphere>
+            <a-sphere color="#2E7D32" radius="0.15" position="0.08 -0.25 0.05"></a-sphere>
+        </a-entity>
+        <a-entity position="4 3.5 2.5">
+            <a-cylinder color="#8B4513" radius="0.1" height="0.2"></a-cylinder>
+            <a-sphere color="#228B22" radius="0.2" position="0 -0.15 0"></a-sphere>
+            <a-sphere color="#2E7D32" radius="0.15" position="-0.08 -0.25 0.05"></a-sphere>
+        </a-entity>
+
+        <!-- ===== FOUNTAIN (on front grass) ===== -->
+        <a-entity gltf-model="#fountain-model" position="-6 0 8" scale="1 1 1"></a-entity>
+
+        <!-- ===== GARDEN ===== -->
+        <!-- Flower beds -->
+        <a-box color="#3d1c00" width="4" height="0.35" depth="1.2" position="-6 0.17 4.5"></a-box>
+        <a-box color="#3d1c00" width="4" height="0.35" depth="1.2" position="6 0.17 4.5"></a-box>
+        <!-- Flowers left -->
+        <a-sphere color="#FF6B6B" radius="0.18" position="-7 0.5 4.5"></a-sphere>
+        <a-sphere color="#FFD93D" radius="0.16" position="-6.4 0.48 4.5"></a-sphere>
+        <a-sphere color="#C084FC" radius="0.17" position="-5.8 0.5 4.5"></a-sphere>
+        <a-sphere color="#FF6B6B" radius="0.15" position="-5.2 0.47 4.5"></a-sphere>
+        <a-sphere color="#FFD93D" radius="0.18" position="-6.7 0.5 4.2"></a-sphere>
+        <a-sphere color="#C084FC" radius="0.14" position="-5.5 0.46 4.8"></a-sphere>
+        <a-cylinder color="#228B22" radius="0.02" height="0.35" position="-7 0.32 4.5"></a-cylinder>
+        <a-cylinder color="#228B22" radius="0.02" height="0.32" position="-6.4 0.31 4.5"></a-cylinder>
+        <a-cylinder color="#228B22" radius="0.02" height="0.35" position="-5.8 0.32 4.5"></a-cylinder>
+        <a-cylinder color="#228B22" radius="0.02" height="0.3" position="-5.2 0.3 4.5"></a-cylinder>
+        <!-- Flowers right -->
+        <a-sphere color="#FF69B4" radius="0.18" position="5.2 0.5 4.5"></a-sphere>
+        <a-sphere color="#FFD93D" radius="0.16" position="5.8 0.48 4.5"></a-sphere>
+        <a-sphere color="#FF6B6B" radius="0.17" position="6.4 0.5 4.5"></a-sphere>
+        <a-sphere color="#C084FC" radius="0.15" position="7 0.47 4.5"></a-sphere>
+        <a-cylinder color="#228B22" radius="0.02" height="0.35" position="5.2 0.32 4.5"></a-cylinder>
+        <a-cylinder color="#228B22" radius="0.02" height="0.32" position="5.8 0.31 4.5"></a-cylinder>
+        <a-cylinder color="#228B22" radius="0.02" height="0.35" position="6.4 0.32 4.5"></a-cylinder>
+        <a-cylinder color="#228B22" radius="0.02" height="0.3" position="7 0.3 4.5"></a-cylinder>
+
+        <!-- Bushes -->
+        <a-sphere color="#2E7D32" radius="0.7" position="-8.5 0.5 2"></a-sphere>
+        <a-sphere color="#388E3C" radius="0.6" position="-8.5 0.45 0.5"></a-sphere>
+        <a-sphere color="#2E7D32" radius="0.65" position="-8.5 0.5 -1"></a-sphere>
+        <a-sphere color="#2E7D32" radius="0.7" position="8.5 0.5 2"></a-sphere>
+        <a-sphere color="#388E3C" radius="0.6" position="8.5 0.45 0.5"></a-sphere>
+        <a-sphere color="#2E7D32" radius="0.65" position="8.5 0.5 -1"></a-sphere>
+        <a-sphere color="#388E3C" radius="0.5" position="-9.5 0.4 6"></a-sphere>
+        <a-sphere color="#2E7D32" radius="0.55" position="9.5 0.4 6"></a-sphere>
+
+        <!-- Palm Trees -->
+        <a-entity gltf-model="#palm-model" position="-10 0 8" scale="1 1 1"></a-entity>
+        <a-entity gltf-model="#palm-model" position="10 0 8" scale="1 1 1"></a-entity>
+        <a-entity gltf-model="#palm-model" position="-11 0 -3" scale="1.2 1.2 1.2"></a-entity>
+        <a-entity gltf-model="#palm-model" position="11 0 -3" scale="1.2 1.2 1.2"></a-entity>
+        <a-entity gltf-model="#palm-model" position="-7 0 14" scale="0.9 0.9 0.9"></a-entity>
+        <a-entity gltf-model="#palm-model" position="8 0 14" scale="1.1 1.1 1.1"></a-entity>
+
+        <!-- ===== CARS ===== -->
+        <!-- Car 1 (right side, close to house) -->
+        <a-entity gltf-model="#car-model" position="6 0 7" rotation="0 180 0" scale="1 1 1"></a-entity>
+        <!-- Car 2 (left side of driveway, scaled down to match car1) -->
+        <a-entity gltf-model="#car2-model" position="-6 0 17" rotation="0 150 0" scale="0.2 0.2 0.2"></a-entity>
+
+        <!-- Driveway lamp posts -->
+        <a-entity position="-3 0 8">
+            <a-cylinder color="#333" radius="0.08" height="3" position="0 1.5 0"></a-cylinder>
+            <a-box color="#333" width="0.3" height="0.15" depth="0.3" position="0 3.05 0"></a-box>
+            <a-sphere color="#FFFACD" radius="0.15" position="0 3.2 0"
+                      animation="property: material.opacity; from: 0.7; to: 1; dur: 2000; loop: true; dir: alternate"></a-sphere>
+            <a-light type="point" color="#FFE4B5" intensity="0.5" distance="8" position="0 3.2 0"></a-light>
+        </a-entity>
+        <a-entity position="3 0 8">
+            <a-cylinder color="#333" radius="0.08" height="3" position="0 1.5 0"></a-cylinder>
+            <a-box color="#333" width="0.3" height="0.15" depth="0.3" position="0 3.05 0"></a-box>
+            <a-sphere color="#FFFACD" radius="0.15" position="0 3.2 0"
+                      animation="property: material.opacity; from: 0.7; to: 1; dur: 2000; loop: true; dir: alternate"></a-sphere>
+            <a-light type="point" color="#FFE4B5" intensity="0.5" distance="8" position="0 3.2 0"></a-light>
+        </a-entity>
+
+        <!-- Stepping stones -->
+        <a-cylinder src="#stone-path" radius="0.5" height="0.04" rotation="-90 0 0" position="-2 0.02 6"></a-cylinder>
+        <a-cylinder src="#stone-path" radius="0.5" height="0.04" rotation="-90 0 0" position="-3 0.02 8"></a-cylinder>
+        <a-cylinder src="#stone-path" radius="0.5" height="0.04" rotation="-90 0 0" position="-2.5 0.02 10"></a-cylinder>
+
+        <!-- Property fence -->
+        <a-box color="#8B7355" width="50" height="1.2" depth="0.12" position="0 0.6 22"></a-box>
+        <a-box color="#8B7355" width="0.12" height="1.2" depth="44" position="-18 0.6 0"></a-box>
+        <a-box color="#8B7355" width="0.12" height="1.2" depth="44" position="18 0.6 0"></a-box>
+        <a-cylinder color="#6B5B3A" radius="0.08" height="1.5" position="-18 0.75 -5"></a-cylinder>
+        <a-cylinder color="#6B5B3A" radius="0.08" height="1.5" position="-18 0.75 5"></a-cylinder>
+        <a-cylinder color="#6B5B3A" radius="0.08" height="1.5" position="-18 0.75 15"></a-cylinder>
+        <a-cylinder color="#6B5B3A" radius="0.08" height="1.5" position="18 0.75 -5"></a-cylinder>
+        <a-cylinder color="#6B5B3A" radius="0.08" height="1.5" position="18 0.75 5"></a-cylinder>
+        <a-cylinder color="#6B5B3A" radius="0.08" height="1.5" position="18 0.75 15"></a-cylinder>
+
+    </a-scene>
+
+    <script>
+        var scene = document.querySelector('a-scene');
+        scene.addEventListener('loaded', function () {
+            setTimeout(function () { document.getElementById('loader').classList.add('hidden'); }, 2800);
+        });
+        setTimeout(function () { document.getElementById('loader').classList.add('hidden'); }, 5000);
+    </script>
+</body>
+</html>

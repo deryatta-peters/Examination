@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dery's Villa VR - Kitchen</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="loading-screen" id="loader">
+        <div class="loading-logo">🍳</div>
+        <div class="loading-title">Kitchen</div>
+        <div class="loading-subtitle">Dery's Luxury Villa</div>
+        <div class="loading-bar-container"><div class="loading-bar"></div></div>
+        <div class="loading-hint">Use WASD to move · Mouse to look around</div>
+    </div>
+
+    <div class="room-label">🍳 Kitchen</div>
+    <div class="hud">WASD to move · Mouse to look</div>
+    <div class="crosshair"></div>
+
+    <div class="nav-panel">
+        <a class="nav-btn" href="living-room.html"><span class="icon">🛋️</span> Living Room</a>
+        <a class="nav-btn" href="pool.html"><span class="icon">🏊</span> Pool Area</a>
+    </div>
+
+    <a-scene renderer="antialias: true" background="color: #1a1a1a">
+        <a-assets timeout="10000">
+            <a-asset-item id="kitchen-model" src="assets/models/kitchen.glb"></a-asset-item>
+        </a-assets>
+
+        <!-- Bright kitchen lighting (toned down) -->
+        <a-light type="ambient" color="#FFF5E1" intensity="0.3"></a-light>
+        <a-light type="point" color="#FFFFFF" intensity="0.3" distance="15" position="0 3 0"></a-light>
+        <a-light type="point" color="#FFE4B5" intensity="0.4" distance="10" position="-2 2.5 -3"></a-light>
+        <a-light type="point" color="#FFE4B5" intensity="0.4" distance="10" position="2 2.5 2"></a-light>
+        <a-light type="directional" color="#FFFFFF" intensity="0.3" position="2 4 1"></a-light>
+        <a-light type="point" color="#FFF5E1" intensity="0.3" distance="10" position="0 2 0"></a-light>
+
+        <!-- Camera (spawned inside the kitchen model) -->
+        <a-entity position="1 0 0">
+            <a-camera wasd-controls="acceleration: 15" look-controls></a-camera>
+        </a-entity>
+
+        <!-- ===== KITCHEN 3D MODEL (full scene) ===== -->
+        <a-entity gltf-model="#kitchen-model" position="0 0 0" scale="1 1 1"></a-entity>
+        <!-- Fill gaps the GLTF model doesn't cover -->
+        <a-plane color="#2a2a2a" rotation="90 0 0" width="12" height="12" position="0 3.5 0"></a-plane>
+        <a-box color="#2a2a2a" width="12" height="4" depth="0.1" position="0 1.5 5" ></a-box>
+        <a-box color="#2a2a2a" width="12" height="4" depth="0.1" position="0 1.5 -5"></a-box>
+        <a-box color="#2a2a2a" width="0.1" height="4" depth="12" position="-5 1.5 0"></a-box>
+        <a-box color="#2a2a2a" width="0.1" height="4" depth="12" position="5 1.5 0"></a-box>
+
+        <!-- ===== STEAM ANIMATION (floating above where the stove would be) ===== -->
+        <a-entity position="1 1.2 -3.85">
+            <a-sphere color="#fff" radius="0.03" position="0 0 0" opacity="0.4"
+                      animation="property: position; from: 0 0 0; to: 0 0.4 0; dur: 2000; loop: true"
+                      animation__fade="property: material.opacity; from: 0.4; to: 0; dur: 2000; loop: true"></a-sphere>
+            <a-sphere color="#fff" radius="0.025" position="0.05 0 0.02" opacity="0.3"
+                      animation="property: position; from: 0.05 0 0.02; to: 0.05 0.35 0.02; dur: 2500; loop: true"
+                      animation__fade="property: material.opacity; from: 0.3; to: 0; dur: 2500; loop: true"></a-sphere>
+            <a-sphere color="#fff" radius="0.02" position="-0.04 0 -0.03" opacity="0.3"
+                      animation="property: position; from: -0.04 0 -0.03; to: -0.04 0.3 -0.03; dur: 1800; loop: true"
+                      animation__fade="property: material.opacity; from: 0.3; to: 0; dur: 1800; loop: true"></a-sphere>
+        </a-entity>
+
+    </a-scene>
+
+    <script>
+        var scene = document.querySelector('a-scene');
+        scene.addEventListener('loaded', function () {
+            setTimeout(function () { document.getElementById('loader').classList.add('hidden'); }, 2800);
+        });
+        setTimeout(function () { document.getElementById('loader').classList.add('hidden'); }, 5000);
+    </script>
+</body>
+</html>
