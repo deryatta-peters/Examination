@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dery's Villa VR - Pool Area</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="loading-screen" id="loader">
+        <div class="loading-logo">🏊</div>
+        <div class="loading-title">Pool Area</div>
+        <div class="loading-subtitle">Dery's Luxury Villa</div>
+        <div class="loading-bar-container"><div class="loading-bar"></div></div>
+        <div class="loading-hint">Use WASD to move · Mouse to look around</div>
+    </div>
+
+    <div class="room-label">🏊 Pool Area</div>
+    <div class="hud">WASD to move · Mouse to look · Watch the water ripple!</div>
+    <div class="crosshair"></div>
+
+    <div class="nav-panel">
+        <a class="nav-btn" href="kitchen.html"><span class="icon">🍳</span> Kitchen</a>
+        <a class="nav-btn" href="rooftop.html"><span class="icon">🌇</span> Rooftop</a>
+    </div>
+
+    <script>
+        /* Custom water physics component */
+        AFRAME.registerComponent('pool-water', {
+            schema: {
+                width:     { type: 'number', default: 7.6 },
+                depth:     { type: 'number', default: 5.6 },
+                segments:  { type: 'number', default: 40 },
+                waveHeight:{ type: 'number', default: 0.06 },
+                waveSpeed: { type: 'number', default: 1.2 },
+                color1:    { type: 'color',  default: '#29B6F6' },
+                color2:    { type: 'color',  default: '#0288D1' }
+            },
+            init: function () {
+                var data = this.data;
+                var geometry = new THREE.PlaneBufferGeometry(data.width, data.depth, data.segments, data.segments);
+                var material = new THREE.MeshPhongMaterial({
+                    color: new THREE.Color(data.color1), transparent: true, opacity: 0.72,
+                    shininess: 90, specular: new THREE.Color('#FFFFFF'), side: THREE.DoubleSide, flatShading: false
+                });
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.rotation.x = -Math.PI / 2;
+                this.el.object3D.add(this.mesh);
+                this.posArray = this.mesh.geometry.attributes.position.array;
+                this.originalY = new Float32Array(this.posArray.length / 3);
+                for (var i = 0; i < this.posArray.length; i += 3) {
+                    this.originalY[i / 3] = this.posArray[i + 2];
+                }
+                this.ripples = [];
+                this.rippleTimer = 0;
+                this.colorA = new THREE.Color(data.color1);
+                this.colorB = new THREE.Color(data.color2);
+            },
+            tick: function (time, delta) {
+                if (!this.mesh) return;
+                var dt = delta / 1000; var data = this.data; var t = time / 1000;
+                var arr = this.mesh.geometry.attributes.position.array;
+                this.rippleTimer += dt;
+                if (this.rippleTimer > 0.8) {
+                    this.rippleTimer = 0;
+                    this.ripples.push({
+                        x: (Math.random() - 0.5) * data.width, z: (Math.random() - 0.5) * data.depth,
+                        born: t, speed: 2.5 + Math.random() * 1.5,
+                        amplitude: 0.02 + Math.random() * 0.03, life: 3 + Math.random() * 2
+                    });
+                }
+                this.ripples = this.ripples.filter(function (r) { return (t - r.born) < r.life; });
+                for (var i = 0; i < arr.length; i += 3) {
+                    var vx = arr[i], vy = arr[i + 1];
+                    var wave1 = Math.sin(vx * 1.2 + t * data.waveSpeed) * data.waveHeight;
+                    var wave2 = Math.sin(vy * 0.8 + t * data.waveSpeed * 0.7 + 1.3) * data.waveHeight * 0.6;
+                    var wave3 = Math.sin((vx + vy) * 0.5 + t * data.waveSpeed * 1.5) * data.waveHeight * 0.3;
+                    var displacement = wave1 + wave2 + wave3;
+                    for (var r = 0; r < this.ripples.length; r++) {
+                        var rip = this.ripples[r]; var age = t - rip.born;
+                        var dx = vx - rip.x, dz = vy - rip.z;
+                        var dist = Math.sqrt(dx * dx + dz * dz);
+                        var ringDist = Math.abs(dist - age * rip.speed);
+                        if (ringDist < 0.8) {
+                            var fade = Math.max(0, 1 - age / rip.life);
+                            var ringFade = Math.max(0, 1 - ringDist / 0.8);
+                            displacement += Math.sin(dist * 6 - age * 8) * rip.amplitude * fade * ringFade;
+                        }
+                    }
+                    arr[i + 2] = this.originalY[i / 3] + displacement;
+                }
+                this.mesh.geometry.attributes.position.needsUpdate = true;
+                this.mesh.geometry.computeVertexNormals();
+                var colorT = (Math.sin(t * 0.5) + 1) / 2;
+                this.mesh.material.color.lerpColors(this.colorA, this.colorB, colorT);
+                this.mesh.material.opacity = 0.68 + Math.sin(t * 1.5) * 0.06;
+            },
+            remove: function () { if (this.mesh) this.el.object3D.remove(this.mesh); }
+        });
+
+        AFRAME.registerComponent('float-bob', {
+            schema: { amplitude: { type: 'number', default: 0.05 }, speed: { type: 'number', default: 1.5 }, offset: { type: 'number', default: 0 } },
+            init: function () { this.startY = this.el.object3D.position.y; },
+            tick: function (time) {
+                var t = time / 1000, d = this.data;
+                this.el.object3D.position.y = this.startY + Math.sin(t * d.speed + d.offset) * d.amplitude;
+                this.el.object3D.rotation.z = Math.sin(t * d.speed * 0.7 + d.offset) * 0.03;
+                this.el.object3D.rotation.x = Math.cos(t * d.speed * 0.5 + d.offset) * 0.02;
+            }
+        });
+
+        AFRAME.registerComponent('caustic-light', {
+            schema: { speed: { type: 'number', default: 2 } },
+            tick: function (time) {
+                var t = time / 1000;
+                var light = this.el.getObject3D('light');
+                if (light) light.intensity = 0.3 + Math.sin(t * this.data.speed) * 0.15 + Math.sin(t * 3.1) * 0.1;
+            }
+        });
+    </script>
+
+    <a-scene renderer="antialias: true" fog="type: linear; color: #87CEEB; far: 60; near: 30">
+        <a-assets timeout="10000">
+            <img id="grass" src="assets/textures/grass.jpg">
+            <img id="wood-deck" src="assets/textures/wood-deck.jpg">
+            <img id="stone-path" src="assets/textures/stone-path.jpg">
+            <img id="sky" src="assets/textures/sky.jpg">
+            <img id="wall" src="assets/textures/wall.jpg">
+            <a-asset-item id="palm-model" src="assets/models/palm-tree.glb"></a-asset-item>
+            <a-asset-item id="lounger-model" src="assets/models/lounger.glb"></a-asset-item>
+        </a-assets>
+
+        <a-sky src="#sky"></a-sky>
+
+        <!-- Lighting -->
+        <a-light type="ambient" color="#FFF5E1" intensity="0.5"></a-light>
+        <a-light type="directional" color="#FFD700" intensity="0.8" position="5 10 5"></a-light>
+        <a-light type="hemisphere" color="#87CEEB" groundColor="#3a7d44" intensity="0.3"></a-light>
+
+        <!-- Camera -->
+        <a-entity position="0 1.6 8">
+            <a-camera wasd-controls="acceleration: 20" look-controls></a-camera>
+        </a-entity>
+
+        <!-- Ground -->
+        <a-plane src="#grass" rotation="-90 0 0" width="30" height="30" repeat="6 6" position="0 0 0"></a-plane>
+        <a-plane src="#wood-deck" rotation="-90 0 0" width="14" height="12" repeat="5 4" position="0 0.02 0"></a-plane>
+
+        <!-- Pool structure (walls go from ground level down into the earth) -->
+        <!-- Front wall (z=-3) -->
+        <a-box color="#4FC3F7" width="8" height="2" depth="0.15" position="0 -1 -3.05" opacity="0.9"></a-box>
+        <!-- Back wall (z=3) -->
+        <a-box color="#4FC3F7" width="8" height="2" depth="0.15" position="0 -1 3.05" opacity="0.9"></a-box>
+        <!-- Left wall -->
+        <a-box color="#4FC3F7" width="0.15" height="2" depth="6.1" position="-4.05 -1 0" opacity="0.9"></a-box>
+        <!-- Right wall -->
+        <a-box color="#4FC3F7" width="0.15" height="2" depth="6.1" position="4.05 -1 0" opacity="0.9"></a-box>
+        <!-- Pool floor (bottom of the pool) -->
+        <a-plane color="#81D4FA" rotation="-90 0 0" width="8" height="6" position="0 -2 0"></a-plane>
+        <a-plane color="#4FC3F7" rotation="-90 0 0" width="7.8" height="5.8" position="0 -1.99 0" opacity="0.3"></a-plane>
+
+        <!-- Pool coping / border stones (raised above deck so they are visible) -->
+        <a-box src="#stone-path" width="9" height="0.3" depth="0.6" position="0 0.15 -3.3" repeat="3 1"></a-box>
+        <a-box src="#stone-path" width="9" height="0.3" depth="0.6" position="0 0.15 3.3" repeat="3 1"></a-box>
+        <a-box src="#stone-path" width="0.6" height="0.3" depth="6.6" position="-4.4 0.15 0" repeat="1 2"></a-box>
+        <a-box src="#stone-path" width="0.6" height="0.3" depth="6.6" position="4.4 0.15 0" repeat="1 2"></a-box>
+
+        <!-- Animated water (at ground level, filling the pool to the brim) -->
+        <a-entity pool-water="width: 7.6; depth: 5.6; segments: 40; waveHeight: 0.08; waveSpeed: 1.2; color1: #29B6F6; color2: #0288D1"
+                  position="0 0.02 0"></a-entity>
+
+        <!-- Underwater caustic lights -->
+        <a-entity position="-2 -1.2 -1">
+            <a-light type="point" color="#4FC3F7" intensity="0.5" distance="8" caustic-light="speed: 2"></a-light>
+        </a-entity>
+        <a-entity position="2 -1.2 1">
+            <a-light type="point" color="#4FC3F7" intensity="0.5" distance="8" caustic-light="speed: 2.5"></a-light>
+        </a-entity>
+        <a-entity position="0 -1.2 0">
+            <a-light type="point" color="#81D4FA" intensity="0.4" distance="10" caustic-light="speed: 1.8"></a-light>
+        </a-entity>
+
+        <!-- Floating objects (adjusted to water level at y=0.02)
+        <a-sphere color="#FF6347" radius="0.15" position="-1.5 0.12 -0.5" float-bob="amplitude: 0.04; speed: 1.2; offset: 0"></a-sphere>
+        <a-cylinder color="#FF69B4" radius="0.04" height="1.2" position="2 0.1 1" rotation="0 30 90"
+                    float-bob="amplitude: 0.03; speed: 1; offset: 2"></a-cylinder>
+        <a-entity position="0.5 0.1 -1.5" float-bob="amplitude: 0.05; speed: 1.4; offset: 1">
+            <a-sphere color="#FFD700" radius="0.1"></a-sphere>
+            <a-sphere color="#FFD700" radius="0.07" position="0.08 0.08 0"></a-sphere>
+            <a-cone color="#FF8C00" radiusBottom="0.03" radiusTop="0.01" height="0.05" position="0.15 0.08 0" rotation="0 0 -90"></a-cone>
+        </a-entity> -->
+
+        <!-- Pool ladder (extends from deck into pool)
+        <a-entity position="4.1 0 0">
+            <a-cylinder color="#C0C0C0" radius="0.03" height="2" position="-0.15 -0.5 0"></a-cylinder>
+            <a-cylinder color="#C0C0C0" radius="0.03" height="2" position="0.15 -0.5 0"></a-cylinder>
+            <a-cylinder color="#C0C0C0" radius="0.02" height="0.3" rotation="0 0 90" position="0 0.2 0"></a-cylinder>
+            <a-cylinder color="#C0C0C0" radius="0.02" height="0.3" rotation="0 0 90" position="0 -0.1 0"></a-cylinder>
+            <a-cylinder color="#C0C0C0" radius="0.02" height="0.3" rotation="0 0 90" position="0 -0.4 0"></a-cylinder>
+            <a-cylinder color="#C0C0C0" radius="0.02" height="0.3" rotation="0 0 90" position="0 -0.7 0"></a-cylinder>
+        </a-entity> -->
+
+        <!-- ===== LOUNGER MODELS (replace primitive lounge chairs) ===== -->
+        <a-entity gltf-model="#lounger-model" position="5.5 0 -1" rotation="0 -90 0" scale="0.2 0.2 0.2"></a-entity>
+        <a-entity gltf-model="#lounger-model" position="5.5 0 1.5" rotation="0 -90 0" scale="0.2 0.2 0.2"></a-entity>
+
+        <!-- Side table + drink -->
+        <a-entity position="5.5 0 0.25">
+            <a-cylinder color="#5C3317" radius="0.25" height="0.5" position="0 0.25 0"></a-cylinder>
+            <a-cylinder color="#FF6347" radius="0.04" height="0.15" position="0.05 0.57 0"></a-cylinder>
+            <a-cylinder color="#FFF" radius="0.05" height="0.12" position="0.05 0.56 0" opacity="0.5"></a-cylinder>
+        </a-entity>
+
+        <!-- Umbrella -->
+        <a-entity position="5.5 0 0.25">
+            <a-cylinder color="#8B7355" radius="0.04" height="2.5" position="0 1.25 0"></a-cylinder>
+            <a-cone color="#FF8C00" radiusBottom="1.5" radiusTop="0.05" height="0.4" position="0 2.6 0" open-ended="true"></a-cone>
+        </a-entity>
+
+        <!-- Palm trees -->
+        <a-entity gltf-model="#palm-model" position="-6 0 -4" scale="1 1 1"></a-entity>
+        <a-entity gltf-model="#palm-model" position="7 0 -3" scale="0.9 0.9 0.9"></a-entity>
+        <a-entity gltf-model="#palm-model" position="-5 0 5" scale="1.1 1.1 1.1"></a-entity>
+        <a-entity gltf-model="#palm-model" position="6 0 6" scale="0.8 0.8 0.8"></a-entity>
+
+        <!-- Bushes & flowers -->
+        <a-sphere color="#2E7D32" radius="0.5" position="-5 0.4 2"></a-sphere>
+        <a-sphere color="#388E3C" radius="0.6" position="-5.5 0.5 0"></a-sphere>
+        <a-sphere color="#2E7D32" radius="0.5" position="7 0.4 1"></a-sphere>
+        <a-entity position="-4.5 0 -3.5">
+            <a-cylinder color="#8B4513" radius="0.2" height="0.4" position="0 0.2 0"></a-cylinder>
+            <a-sphere color="#FF69B4" radius="0.2" position="0 0.5 0"></a-sphere>
+        </a-entity>
+        <a-entity position="4.5 0 -3.5">
+            <a-cylinder color="#8B4513" radius="0.2" height="0.4" position="0 0.2 0"></a-cylinder>
+            <a-sphere color="#FFD93D" radius="0.2" position="0 0.5 0"></a-sphere>
+        </a-entity>
+
+        <!-- String lights -->
+        <a-sphere color="#FFFACD" radius="0.06" position="-3 3 -4" animation="property: material.opacity; from: 0.6; to: 1; dur: 2000; loop: true; dir: alternate"></a-sphere>
+        <a-sphere color="#FFFACD" radius="0.06" position="-1 3 -4" animation="property: material.opacity; from: 0.7; to: 1; dur: 1800; loop: true; dir: alternate"></a-sphere>
+        <a-sphere color="#FFFACD" radius="0.06" position="1 3 -4" animation="property: material.opacity; from: 0.5; to: 1; dur: 2200; loop: true; dir: alternate"></a-sphere>
+        <a-sphere color="#FFFACD" radius="0.06" position="3 3 -4" animation="property: material.opacity; from: 0.6; to: 1; dur: 1900; loop: true; dir: alternate"></a-sphere>
+
+        <!-- Villa back wall -->
+        <a-box src="#wall" width="12" height="4" depth="0.3" position="0 2 -7" repeat="3 2"></a-box>
+
+    </a-scene>
+
+    <script>
+        var scene = document.querySelector('a-scene');
+        scene.addEventListener('loaded', function () {
+            setTimeout(function () { document.getElementById('loader').classList.add('hidden'); }, 2800);
+        });
+        setTimeout(function () { document.getElementById('loader').classList.add('hidden'); }, 5000);
+    </script>
+</body>
+</html>
