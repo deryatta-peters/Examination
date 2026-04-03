@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dery's  Villa VR - Bedroom</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="loading-screen" id="loader">
+        <div class="loading-logo">🛏️</div>
+        <div class="loading-title">Bedroom</div>
+        <div class="loading-subtitle">Dery's Luxury Villa</div>
+        <div class="loading-bar-container"><div class="loading-bar"></div></div>
+        <div class="loading-hint">Use WASD to move · Mouse to look around</div>
+    </div>
+
+    <div class="room-label">🛏️ Bedroom</div>
+    <div class="hud">WASD to move · Mouse to look</div>
+    <div class="crosshair"></div>
+
+    <div class="nav-panel">
+        <a class="nav-btn" href="living-room.html"><span class="icon">🛋️</span> Living Room</a>
+    </div>
+
+    <a-scene renderer="antialias: true" background="color: #1a1a1a">
+        <a-assets timeout="10000">
+            <a-asset-item id="bedroom-model" src="assets/models/bedroom.glb"></a-asset-item>
+        </a-assets>
+
+        <!-- Warm bedroom lighting (boosted for GLTF model) -->
+        <a-light type="ambient" color="#FFF5E1" intensity="1.0"></a-light>
+        <a-light type="point" color="#FFE4B5" intensity="1.2" distance="15" position="0 3 0"></a-light>
+        <a-light type="point" color="#FFA07A" intensity="0.6" distance="8" position="-2.5 1.5 -3.5"></a-light>
+        <a-light type="point" color="#FFA07A" intensity="0.6" distance="8" position="2.5 1.5 -3.5"></a-light>
+        <a-light type="directional" color="#FFFFFF" intensity="0.6" position="2 4 1"></a-light>
+        <a-light type="point" color="#FFF5E1" intensity="0.6" distance="10" position="0 2 0"></a-light>
+
+        <!-- Camera (spawned inside the bedroom model) -->
+        <a-entity position="4 0 2">
+            <a-camera wasd-controls="acceleration: 15" look-controls></a-camera>
+        </a-entity>
+
+        <!-- ===== BEDROOM 3D MODEL (full scene) ===== -->
+        <a-entity gltf-model="#bedroom-model" position="0 0 0" scale="1 1 1"></a-entity>
+
+        <!-- ===== CEILING FAN (animated, lowered to fit inside the GLTF room ceiling) ===== -->
+        <!-- <a-entity position="0 2.8 0" animation="property: rotation; from: 0 0 0; to: 0 360 0; dur: 3000; loop: true; easing: linear">
+            <a-cylinder color="#5C3317" radius="0.08" height="0.12"></a-cylinder>
+            <a-box color="#8B7355" width="1.5" height="0.03" depth="0.15" position="0.75 -0.08 0"></a-box>
+            <a-box color="#8B7355" width="1.5" height="0.03" depth="0.15" position="-0.75 -0.08 0"></a-box>
+            <a-box color="#8B7355" width="0.15" height="0.03" depth="1.5" position="0 -0.08 0.75"></a-box>
+            <a-box color="#8B7355" width="0.15" height="0.03" depth="1.5" position="0 -0.08 -0.75"></a-box>
+        </a-entity>
+        <a-cylinder color="#333" radius="0.02" height="0.15" position="0 2.87 0"></a-cylinder> -->
+
+    </a-scene>
+
+    <script>
+        var scene = document.querySelector('a-scene');
+        scene.addEventListener('loaded', function () {
+            setTimeout(function () { document.getElementById('loader').classList.add('hidden'); }, 2800);
+        });
+        setTimeout(function () { document.getElementById('loader').classList.add('hidden'); }, 5000);
+    </script>
+</body>
+</html>
